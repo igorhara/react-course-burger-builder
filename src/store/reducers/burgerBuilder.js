@@ -4,7 +4,8 @@ import * as actionTypes from '../actions/actionTypes';
 const initialState = {
     ingredients:null,
     totalPrice:4,
-    error:false
+    error:false,
+    building:false
 };
 
 const INGREDIENT_PRICES = {
@@ -18,6 +19,7 @@ const addIngredient = (newState,action)=>{
     newState.ingredients[action.ingredientName]++;
     const priceAddition = INGREDIENT_PRICES[action.ingredientName];
     const oldPriceAdd = newState.totalPrice;
+    newState.building=true;
     newState.totalPrice=oldPriceAdd+priceAddition;
 };
 
@@ -25,6 +27,7 @@ const removeIngredient = (newState,action)=>{
     newState.ingredients[action.ingredientName]--;
     const priceDeduction = INGREDIENT_PRICES[action.ingredientName];
     const oldPriceSub = newState.totalPrice;
+    newState.building=true;
     newState.totalPrice=oldPriceSub-priceDeduction;
 };
 
@@ -45,6 +48,7 @@ const reducer = (state = initialState,action)=>{
             newState.ingredients = action.ingredients;
             newState.error=false;
             newState.totalPrice=4;
+            newState.building=false;
             break;
         case(actionTypes.FETCH_INGREDIENTS_FAILED):
             newState.error=true;

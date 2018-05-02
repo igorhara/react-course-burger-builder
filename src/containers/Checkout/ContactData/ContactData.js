@@ -7,6 +7,7 @@ import Input from "../../../components/ui/Input/Input";
 import {connect} from "react-redux";
 import withErrorHandler from "../../../hoc/withErrorHandler/withErrorHandler";
 import * as actions from "../../../store/actions/index";
+import {checkValidity, updateObject} from "../../../shared/utility";
 class ContactData extends Component{
     state={
         orderForm:{
@@ -96,7 +97,7 @@ class ContactData extends Component{
 
     orderHandler = (event)=>{
         event.preventDefault();
-        console.log(this.props);
+
         const formData = {};
         for(let key in this.state.orderForm){
             formData[key]=this.state.orderForm[key].value;
@@ -112,17 +113,15 @@ class ContactData extends Component{
 
     };
     inputChangedHandler=(event,inputId)=>{
-       const updatedOrderForm = {
-           ...this.state.orderForm
-       };
-       const updatedFormElement = {
-           ...updatedOrderForm[inputId]
-       };
-       updatedFormElement.value = event.target.value;
-       updatedFormElement.touched = true;
-       updatedFormElement.valid = this.checkValidity(updatedFormElement.value,updatedFormElement.validation);
-       console.log(updatedFormElement);
-       updatedOrderForm[inputId] = updatedFormElement;
+       const updatedFormElement = updateObject(this.state.orderForm[inputId],{
+           value: event.target.value,
+           touched: true,
+           valid: checkValidity(event.target.value,this.state.orderForm[inputId].validation)
+       });
+       const updatedOrderForm = updateObject(this.state.orderForm,{
+           [inputId]:updatedFormElement
+       });
+
        let formIsValid =true;
        for(let key in updatedOrderForm){
           formIsValid = updatedOrderForm[key].valid && formIsValid;
@@ -132,26 +131,6 @@ class ContactData extends Component{
 
     };
 
-    checkValidity(value,rules){
-        let isValid = true;
-        if(!rules){
-            return true;
-        }
-
-        if(rules.required){
-           isValid = value.trim() !== '';
-        }
-
-        if(isValid && rules.minLength){
-            isValid = value.length >= rules.minLength;
-        }
-
-        if(isValid && rules.maxLength){
-            isValid = value.length <= rules.maxLength;
-        }
-
-        return isValid;
-    }
 
     render(){
         const formElementsArray=[];
